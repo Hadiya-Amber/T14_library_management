@@ -1,29 +1,16 @@
 {
-  "name": "library-management-frontend",
-  "version": "0.0.0",
+  "name": "application",
+  "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "description": "Frontend for Library Management - Vite + React + TypeScript",
+  "description": "Created by Propel provisioning for a repository that had no package manifest.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "test": "vitest --environment jsdom"
+    "test": "npx vitest run"
   },
   "dependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react": "*",
+    "typescript": "*",
+    "vite": "*",
+    "vitest": "*"
   },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "vite": "^8.0.0",
-    "vitest": "^3.0.0",
-    "@testing-library/react": "^14.0.0",
-    "@types/react": "^18.0.0",
-    "@types/react-dom": "^18.0.0"
-  },
-  "vitest": {
-    "test": {
-      "environment": "jsdom"
-    }
-  }
+  "devDependencies": {}
 }
