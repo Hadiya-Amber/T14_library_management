@@ -1,0 +1,31 @@
+/* Mobile-first single column layout */
+.container {
+  box-sizing: border-box;
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  padding: 16px 0;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.main {
+  padding: 24px 0;
+  min-height: 300px;
+}
+
+.footer {
+  padding: 16px 0;
+  border-top: 1px solid #eaeaea;
+  text-align: center;
+}
+
+/* Prevent horizontal scroll on small devices */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
