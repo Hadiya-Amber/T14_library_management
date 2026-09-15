@@ -1,0 +1,16 @@
+{
+  "name": "application",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Created by Propel provisioning for a repository that had no package manifest.",
+  "scripts": {
+    "test": "npx vitest run"
+  },
+  "dependencies": {
+    "react": "*",
+    "typescript": "*",
+    "vite": "*",
+    "vitest": "*"
+  },
+  "devDependencies": {}
+}
