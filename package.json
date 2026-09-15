@@ -4,7 +4,14 @@
   "private": true,
   "description": "Created by Propel provisioning for a repository that had no package manifest.",
   "scripts": {
-    "test": "npx vitest run"
+    "dev": "vite",
+    "build": "vite build",
+    "test": "npx vitest run --environment jsdom"
+  },
+  "vitest": {
+    "test": {
+      "environment": "jsdom"
+    }
   },
   "dependencies": {
     "react": "*",
