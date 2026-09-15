@@ -1,0 +1,86 @@
+/**
+ * Styles for the OpeningHours component.
+ *
+ * Provides panel surface, row hover lift, badge styling, and animation wiring.
+ */
+
+.panel {
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+  animation: rise 420ms var(--ease-out) forwards;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 500;
+  animation: pulse 600ms ease-out forwards;
+}
+
+.open {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.closed {
+  background: var(--surface);
+  color: var(--ink-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: calc(var(--radius) / 2);
+  transition: transform 160ms var(--ease-out), background-color 160ms var(--ease-out);
+}
+
+.row:hover {
+  transform: translateY(-2px);
+  background-color: var(--accent-soft);
+}
+
+.currentRow {
+  background-color: var(--accent-soft);
+}
+
+.day {
+  font-weight: 500;
+  color: var(--ink);
+  margin: 0;
+}
+
+.hours {
+  color: var(--ink);
+  margin: 0;
+}
+
+.closedHours {
+  color: var(--ink-muted);
+}
