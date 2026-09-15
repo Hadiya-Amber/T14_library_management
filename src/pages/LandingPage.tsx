@@ -5,6 +5,7 @@
  */
 import React from "react";
 import styles from "./LandingPage.module.css";
+import Hero from "../components/Hero";
 
 /**
  * LandingPage is the public-facing page for the application.
@@ -18,7 +19,10 @@ export default function LandingPage(): JSX.Element {
   return (
     <div className={styles.container}>
       <header className={styles.header} role="banner">
-        <h1>Library Management</h1>
+        <Hero
+          name="Library Management"
+          description="A concise one-line description."
+        />
       </header>
 
       <main className={styles.main} role="main">
