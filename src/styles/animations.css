@@ -1,0 +1,54 @@
+/**
+ * Animation keyframes and motion utilities for the Library Management application.
+ *
+ * All animations respect prefers-reduced-motion and are disabled when
+ * the user has requested reduced motion.
+ */
+
+/* Rise animation - 18px upward translate from opacity:0 over 420ms */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse animation - 600ms ring expanding from badge */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(180, 83, 9, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(180, 83, 9, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(180, 83, 9, 0);
+  }
+}
+
+/* Stagger delay utilities for mount animations */
+[data-animation="rise"].stagger-1 {
+  animation-delay: 0ms;
+}
+
+[data-animation="rise"].stagger-2 {
+  animation-delay: 80ms;
+}
+
+[data-animation="rise"].stagger-3 {
+  animation-delay: 160ms;
+}
+
+/* Reduced motion - disable all animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
