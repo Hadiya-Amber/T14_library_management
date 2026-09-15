@@ -1,0 +1,20 @@
+.cta {
+  display: inline-block;
+  background-color: #0366d6; /* primary blue */
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px; /* ensures hit area >= 44x44 on most fonts */
+  border-radius: 6px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.cta:focus-visible {
+  /* Provide a clearly visible focus ring for keyboard users. */
+  outline: 3px solid Highlight; /* visible system highlight color */
+  outline-offset: 3px;
+}
+
+.cta:active {
+  background-color: #0356b6;
+}
