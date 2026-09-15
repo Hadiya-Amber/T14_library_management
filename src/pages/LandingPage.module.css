@@ -1,0 +1,31 @@
+.container {
+  box-sizing: border-box;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.header {
+  background: #f5f5f5;
+  padding: 1rem;
+}
+
+.main {
+  flex: 1 1 auto;
+}
+
+.footer {
+  background: #f5f5f5;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* Responsive breakpoint for wider layouts */
+@media (min-width: 768px) {
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+}

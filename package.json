@@ -1,0 +1,28 @@
+{
+  "name": "application",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Created by Propel provisioning for a repository that had no package manifest.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "npx vitest run --environment jsdom"
+  },
+  "vitest": {
+    "test": {
+      "environment": "jsdom"
+    }
+  },
+  "dependencies": {
+    "react": "*",
+    "typescript": "*",
+    "vite": "*",
+    "vitest": "*",
+    "react-dom": "*"
+  },
+  "devDependencies": {
+    "jsdom": "*",
+    "@testing-library/react": "*",
+    "@testing-library/jest-dom": "*"
+  }
+}
