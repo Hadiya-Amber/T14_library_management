@@ -6,6 +6,7 @@
 import React from "react";
 import styles from "./LandingPage.module.css";
 import Hero from "../components/Hero";
+import CatalogueCta from "../components/CatalogueCta";
 
 /**
  * LandingPage is the public-facing page for the application.
@@ -27,6 +28,7 @@ export default function LandingPage(): JSX.Element {
 
       <main className={styles.main} role="main">
         <p>Welcome to the library.</p>
+        <CatalogueCta />
       </main>
 
       <footer className={styles.footer} role="contentinfo">
