@@ -4,7 +4,7 @@
   "private": true,
   "description": "Created by Propel provisioning for a repository that had no package manifest.",
   "scripts": {
-    "test": "npx vitest run"
+    "test": "npx vitest run --environment jsdom"
   },
   "dependencies": {
     "react": "*",
@@ -12,5 +12,15 @@
     "vite": "*",
     "vitest": "*"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/jsdom": "^30.0.0",
+    "jsdom": "^30.0.1"
+  },
+  "vitest": {
+    "test": {
+      "environment": "jsdom"
+    }
+  }
 }
