@@ -45,7 +45,7 @@ export default function BookShelf({ books }: BookShelfProps): JSX.Element {
       tabIndex={0}
       data-animation="marquee"
     >
-      <div className={styles.scrollContainer}>
+      <div className={styles.scrollContainer} role="list">
         {books.map((book) => (
           <BookCard key={book.id} book={book} />
         ))}

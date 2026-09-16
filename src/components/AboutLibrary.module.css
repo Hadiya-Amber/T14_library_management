@@ -1,0 +1,41 @@
+.about {
+  background: transparent;
+}
+
+.inner {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.copy {
+  color: var(--ink);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.stat {
+  text-align: center;
+}
+
+.value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.label {
+  color: var(--ink-muted);
+  font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}

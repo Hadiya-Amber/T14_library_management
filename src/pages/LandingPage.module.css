@@ -23,9 +23,7 @@
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
+  display: block;
 }
 
 .heroSection {
@@ -55,16 +53,27 @@
 /* Responsive breakpoint for wider layouts */
 @media (min-width: 768px) {
   .container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 
-  .content {
-    flex-direction: row;
-    align-items: flex-start;
+  .shell {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 32px;
+    box-sizing: border-box;
+    display: block;
   }
 
-  .heroSection {
-    flex: 1 1 auto;
+  /* make the shelf's scroll container able to shrink so it doesn't expand the shell */
+  .shelf {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .shell {
+    padding-inline: 16px;
   }
 }
