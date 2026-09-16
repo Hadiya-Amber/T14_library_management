@@ -42,6 +42,16 @@
   }
 }
 
+/* Marquee animation - slow leftward drift for scrolling shelves */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 /* Stagger delay utilities for mount animations */
 [data-animation="rise"].stagger-1 {
   animation-delay: 0ms;
@@ -53,6 +63,16 @@
 
 [data-animation="rise"].stagger-3 {
   animation-delay: 160ms;
+}
+
+/* Marquee animation wiring - slow drift, paused on hover/focus */
+[data-animation="marquee"] .scrollContainer {
+  animation: marquee 30s linear infinite;
+}
+
+[data-animation="marquee"]:hover .scrollContainer,
+[data-animation="marquee"]:focus-within .scrollContainer {
+  animation-play-state: paused;
 }
 
 /* Reduced motion - disable all animations */
@@ -67,5 +87,9 @@
   [data-animation="fade-down"] {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  [data-animation="marquee"] .scrollContainer {
+    animation: none !important;
   }
 }
