@@ -30,6 +30,18 @@
   }
 }
 
+/* Fade-down animation - settles in from -12px over 320ms */
+@keyframes fade-down {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Stagger delay utilities for mount animations */
 [data-animation="rise"].stagger-1 {
   animation-delay: 0ms;
@@ -50,5 +62,10 @@
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  [data-animation="fade-down"] {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,0 +1,72 @@
+/**
+ * Styles for the NavBar component.
+ *
+ * Sticky positioning, surface-raised background, focus rings,
+ * and responsive wrap below 768px.
+ */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  animation: fade-down 320ms var(--ease-out) forwards;
+}
+
+.inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.wordmark {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.link {
+  display: inline-block;
+  padding: var(--space-1) var(--space-2);
+  color: var(--ink-muted);
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: color 150ms var(--ease-out);
+}
+
+.link:hover {
+  color: var(--accent);
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Responsive: links wrap to second row below 768px */
+@media (max-width: 767px) {
+  .inner {
+    padding: var(--space-3);
+  }
+
+  .links {
+    gap: var(--space-3);
+  }
+}
