@@ -5,6 +5,7 @@
  */
 import React from "react";
 import styles from "./LandingPage.module.css";
+import NavBar from "../components/NavBar";
 import Hero from "../components/Hero";
 import CatalogueCta from "../components/CatalogueCta";
 import OpeningHours from "../components/OpeningHours";
@@ -31,9 +32,10 @@ const DEFAULT_SCHEDULE = [
 export default function LandingPage(): JSX.Element {
   return (
     <div className={styles.container}>
+      <NavBar />
       <header className={styles.header} role="banner">
         <Hero
-          name="Library Management"
+          name="Indian National Library"
           description="A concise one-line description."
         />
       </header>
