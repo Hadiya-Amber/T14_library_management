@@ -8,7 +8,9 @@ import styles from "./LandingPage.module.css";
 import NavBar from "../components/NavBar";
 import Hero from "../components/Hero";
 import CatalogueCta from "../components/CatalogueCta";
+import BookShelf from "../components/BookShelf";
 import OpeningHours from "../components/OpeningHours";
+import { BOOKS } from "../data/books";
 
 /** Default seven-day schedule for the library */
 const DEFAULT_SCHEDULE = [
@@ -46,6 +48,7 @@ export default function LandingPage(): JSX.Element {
             <p className={styles.welcome}>Welcome to the library.</p>
             <CatalogueCta />
           </div>
+          <BookShelf books={BOOKS} />
           <OpeningHours schedule={DEFAULT_SCHEDULE} now={new Date()} />
         </div>
       </main>

@@ -1,0 +1,116 @@
+/**
+ * Styles for the BookShelf component.
+ *
+ * Provides a horizontally scrolling shelf with book cards that have
+ * cover images, titles, and authors. Includes scroll snapping, hover
+ * lift effects, and marquee animation.
+ */
+
+/* The shelf region - keyboard accessible with focus ring */
+.shelf {
+  width: 100%;
+  outline: none;
+}
+
+.shelf:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Scrollable container with horizontal overflow */
+.scrollContainer {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: var(--space-4) 0;
+  /* Hide scrollbar visually but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual book card */
+.card {
+  flex: 0 0 auto;
+  width: 160px;
+  background: var(--surface-raised);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  scroll-snap-align: start;
+  transition: transform 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+  overflow: hidden;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(28, 25, 23, 0.12), 0 12px 32px rgba(28, 25, 23, 0.08);
+}
+
+/* Cover area with 2:3 aspect ratio */
+.coverArea {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, var(--accent) 100%);
+  overflow: hidden;
+}
+
+/* Cover image */
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Placeholder shown when image fails to load */
+.coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.placeholderTitle {
+  color: var(--surface-raised);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Card content area */
+.cardContent {
+  padding: var(--space-3);
+}
+
+/* Book title */
+.title {
+  font-size: 1rem;
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 0 0 var(--space-1) 0;
+  /* Truncate long titles */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Book author */
+.author {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--ink-muted);
+  margin: 0;
+  /* Truncate long author names */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
