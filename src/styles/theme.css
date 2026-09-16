@@ -1,19 +1,23 @@
 /**
  * Design tokens for the Library Management application.
  *
- * Defines the warm paper palette, spacing scale, radius, shadow, and easing
- * used throughout the application.
+ * Defines the deep teal palette, spacing scale, radius, shadow, easing,
+ * and typography used throughout the application.
  */
 
 :root {
-  /* Palette - warm paper ground */
-  --surface: #fbf8f3;
+  /* Palette - deep teal ground */
+  --surface: #f2f7f6;
   --surface-raised: #ffffff;
-  --ink: #1c1917;
-  --ink-muted: #6b6560;
-  --accent: #b45309;
-  --accent-soft: #fef3e2;
-  --border: #e7e2d9;
+  --ink: #0f1f1c;
+  --ink-muted: #5b6b67;
+  --accent: #0f766e;
+  --accent-soft: #d8f0ec;
+  --border: #d3e2de;
+
+  /* Typography - web-safe stacks, no external fonts */
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Spacing scale - 4px base */
   --space-1: 4px;
@@ -29,9 +33,19 @@
   --radius: 12px;
 
   /* Elevation */
-  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06),
-            0 8px 24px rgba(28, 25, 23, 0.06);
+  --shadow: 0 1px 2px rgba(15, 31, 28, 0.06),
+            0 8px 24px rgba(15, 31, 28, 0.06);
 
   /* Motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Apply body font */
+body {
+  font-family: var(--font-body);
+}
+
+/* Apply display font to headings */
+h1, h2, h3 {
+  font-family: var(--font-display);
 }
