@@ -46,9 +46,16 @@ export default function BookShelf({ books }: BookShelfProps): JSX.Element {
       data-animation="marquee"
     >
       <div className={styles.scrollContainer} role="list">
+        {/* First copy of books - visible to assistive technology */}
         {books.map((book) => (
-          <BookCard key={book.id} book={book} />
+          <BookCard key={`first-${book.id}`} book={book} />
         ))}
+        {/* Second copy of books - hidden from assistive technology for seamless loop */}
+        <div aria-hidden="true" style={{ display: 'contents' }}>
+          {books.map((book) => (
+            <BookCard key={`second-${book.id}`} book={book} />
+          ))}
+        </div>
       </div>
     </section>
   );
