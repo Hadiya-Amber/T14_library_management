@@ -10,6 +10,8 @@ import Hero from "../components/Hero";
 import CatalogueCta from "../components/CatalogueCta";
 import BookShelf from "../components/BookShelf";
 import OpeningHours from "../components/OpeningHours";
+import AboutLibrary from "../components/AboutLibrary";
+import Footer from "../components/Footer";
 import { BOOKS } from "../data/books";
 
 /** Default seven-day schedule for the library */
@@ -43,19 +45,21 @@ export default function LandingPage(): JSX.Element {
       </header>
 
       <main className={styles.main} role="main">
-        <div className={styles.content}>
+        <div data-layout="shell" className={styles.shell}>
           <div className={styles.heroSection}>
             <p className={styles.welcome}>Welcome to the library.</p>
             <CatalogueCta />
           </div>
+
           <BookShelf books={BOOKS} />
+
           <OpeningHours schedule={DEFAULT_SCHEDULE} now={new Date()} />
+
+          <AboutLibrary foundedYear={1836} now={new Date()} />
         </div>
       </main>
 
-      <footer className={styles.footer} role="contentinfo">
-        <small>© Library</small>
-      </footer>
+      <Footer />
     </div>
   );
 }
