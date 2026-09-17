@@ -11,6 +11,7 @@ import CatalogueCta from "../components/CatalogueCta";
 import BookShelf from "../components/BookShelf";
 import OpeningHours from "../components/OpeningHours";
 import AboutLibrary from "../components/AboutLibrary";
+import MembershipNotice from "../components/MembershipNotice";
 import Footer from "../components/Footer";
 import { BOOKS } from "../data/books";
 
@@ -50,6 +51,8 @@ export default function LandingPage(): JSX.Element {
             <p className={styles.welcome}>Welcome to the library.</p>
             <CatalogueCta />
           </div>
+
+          <MembershipNotice />
 
           <BookShelf books={BOOKS} />
 
