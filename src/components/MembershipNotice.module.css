@@ -1,0 +1,25 @@
+:root {
+  /* no new tokens; rely on existing theme.css */
+}
+
+.notice {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  margin: 0 0 var(--space-2) 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.line {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+}
