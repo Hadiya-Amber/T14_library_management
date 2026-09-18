@@ -42,6 +42,18 @@
   }
 }
 
+/* Dialog open animation - fade in and rise 8px over 160ms */
+@keyframes dialog-open {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Marquee animation - slow leftward drift for scrolling shelves */
 @keyframes marquee {
   0% {
@@ -85,6 +97,11 @@
   }
 
   [data-animation="fade-down"] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  [data-animation="dialog"] {
     opacity: 1;
     transform: translateY(0);
   }
