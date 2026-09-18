@@ -29,6 +29,11 @@ export default function NavBar(): JSX.Element {
             </a>
           </li>
           <li>
+            <a href="#membership" className={styles.link}>
+              Membership
+            </a>
+          </li>
+          <li>
             <a href="#about" className={styles.link}>
               About
             </a>

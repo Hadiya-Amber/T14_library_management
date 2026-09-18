@@ -12,6 +12,7 @@ import BookShelf from "../components/BookShelf";
 import OpeningHours from "../components/OpeningHours";
 import AboutLibrary from "../components/AboutLibrary";
 import MembershipNotice from "../components/MembershipNotice";
+import MembershipPlans from "../components/MembershipPlans";
 import Footer from "../components/Footer";
 import { BOOKS } from "../data/books";
 
@@ -53,6 +54,9 @@ export default function LandingPage(): JSX.Element {
           </div>
 
           <MembershipNotice />
+
+          {/* Membership plans section placed beneath the membership notice */}
+          <MembershipPlans />
 
           <BookShelf books={BOOKS} />
 
