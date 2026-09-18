@@ -1,0 +1,72 @@
+/* Styles for the MembershipPlans component using theme tokens only */
+.container {
+  padding: var(--space-6) 0;
+}
+.heading {
+  font-family: var(--font-display);
+  margin: 0 0 var(--space-4) 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-5);
+}
+.card {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.planName {
+  margin: 0;
+  font-family: var(--font-display);
+}
+.pill {
+  background: var(--accent-soft);
+  color: var(--ink);
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+}
+.price {
+  margin: var(--space-3) 0;
+  font-weight: 600;
+}
+.perks {
+  margin: 0 0 var(--space-4) 0;
+  padding-left: 1.25rem;
+}
+.perks li {
+  margin-bottom: 0.5rem;
+}
+.actions {
+  margin-top: auto;
+}
+.cta {
+  background: var(--accent);
+  color: var(--surface);
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 160ms var(--ease-out);
+}
+.cta:hover {
+  opacity: 0.95;
+}
+
+/* Responsive: stack to single column on small screens */
+@media (max-width: 375px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
