@@ -1,76 +1,157 @@
 /**
  * BookShelf component - a horizontally scrolling shelf of book cards.
  *
- * Renders a region named "Featured books" containing article elements for each book.
- * Each article displays a cover image (with fallback), title, and author.
- * The shelf supports keyboard navigation and has a marquee animation.
+ * Uses live catalogue data from the API, while preserving the existing
+ * shelf card markup, motion, and details dialog behavior.
  */
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./BookShelf.module.css";
-import BookDetailsDialog, { Book as DetailBook } from "./BookDetailsDialog";
+import BookDetailsDialog, { type Book as DetailBook } from "./BookDetailsDialog";
+import { BOOKS } from "../data/books";
+import { fetchBooks } from "../data/booksApi";
 
-/** Book data structure */
+/** Shelf card shape consumed by the list renderer. */
 export interface Book {
-  /** Unique identifier for the book */
+  /** Unique identifier for the book. */
   id: string;
-  /** Book title */
+  /** Book title. */
   title: string;
-  /** Book author */
+  /** Book author. */
   author: string;
-  /** Cover image URL */
+  /** Cover image URL. */
   cover: string;
+  /** Optional genre used by the dialog. */
+  genre?: string;
+  /** Optional availability flag used by the dialog. */
+  available?: boolean;
+  /** Optional publication year used by the dialog. */
+  year?: number;
 }
 
-/** Props for the BookShelf component */
+/** Props for the BookShelf component. */
 export interface BookShelfProps {
-  /** Array of books to display */
+  /** Initial array of books to display before API settles. */
   books: Book[];
+}
+
+type ShelfState = "loading" | "live" | "offline";
+
+const OFFLINE_BOOKS: Book[] = BOOKS.slice(0, 6);
+
+/**
+ * Converts shelf book data into the detail dialog shape.
+ *
+ * @param book - Shelf item.
+ * @returns Dialog-compatible book with safe defaults.
+ */
+function toDetailBook(book: Book): DetailBook {
+  return {
+    id: book.id,
+    title: book.title,
+    author: book.author,
+    cover: book.cover,
+    genre: book.genre ?? "General",
+    available: book.available ?? false,
+    year: book.year,
+  };
 }
 
 /**
  * BookShelf component.
  *
- * Renders a horizontally scrolling region with book cards.
- * Each card shows a cover image (with gradient placeholder on error),
- * the book title, and author name.
- *
- * @param props - BookShelfProps
- * @returns JSX.Element
+ * @param books - Initial books.
+ * @returns Rendered shelf and dialog.
  */
 export default function BookShelf({ books }: BookShelfProps): JSX.Element {
   const [selected, setSelected] = useState<DetailBook | null>(null);
+  const [state, setState] = useState<ShelfState>("loading");
+  const [shelfBooks, setShelfBooks] = useState<Book[]>(books);
   const openerRef = useRef<HTMLElement | null>(null);
 
+  useEffect(() => {
+    const abortController = new AbortController();
+    let active = true;
+
+    fetchBooks(abortController.signal)
+      .then((apiBooks) => {
+        if (!active) {
+          return;
+        }
+        setShelfBooks(apiBooks);
+        setState("live");
+      })
+      .catch(() => {
+        if (!active) {
+          return;
+        }
+        setShelfBooks(OFFLINE_BOOKS);
+        setState("offline");
+      });
+
+    return () => {
+      active = false;
+      abortController.abort();
+    };
+  }, []);
+
   return (
-    <section
-      className={styles.shelf}
-      aria-label="Featured books"
-      tabIndex={0}
-      data-animation="marquee"
-    >
-      <div className={styles.scrollContainer} role="list">
-        {/* First copy of books - visible to assistive technology */}
-        {books.map((book) => (
-          <BookCard key={`first-${book.id}`} book={book} onOpen={(el) => { openerRef.current = el; setSelected(book as DetailBook); }} />
-        ))}
-        {/* Second copy of books - hidden from assistive technology for seamless loop */}
-        <div aria-hidden="true" style={{ display: 'contents' }}>
-          {books.map((book) => (
-            <BookCard key={`second-${book.id}`} book={book} onOpen={(el) => { openerRef.current = el; setSelected(book as DetailBook); }} />
+    <>
+      {state === "loading" && (
+        <p className={styles.statusLine} aria-live="polite">
+          <span className={styles.statusDot} aria-hidden="true" />
+          Loading the catalogue
+        </p>
+      )}
+
+      {state === "offline" && (
+        <p className={styles.statusLine} aria-live="polite">
+          <span className={styles.statusDot} aria-hidden="true" />
+          Showing the offline catalogue
+        </p>
+      )}
+
+      <section
+        className={state === "loading" ? `${styles.shelf} ${styles.shelfLoading}` : styles.shelf}
+        aria-label="Featured books"
+        tabIndex={0}
+        data-animation="marquee"
+      >
+        <div className={styles.scrollContainer} role="list">
+          {shelfBooks.map((book) => (
+            <BookCard
+              key={`first-${book.id}`}
+              book={book}
+              onOpen={(el) => {
+                openerRef.current = el;
+                setSelected(toDetailBook(book));
+              }}
+            />
           ))}
+          <div aria-hidden="true" style={{ display: "contents" }}>
+            {shelfBooks.map((book) => (
+              <BookCard
+                key={`second-${book.id}`}
+                book={book}
+                onOpen={(el) => {
+                  openerRef.current = el;
+                  setSelected(toDetailBook(book));
+                }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      <BookDetailsDialog book={selected} openerRef={openerRef} onClose={() => setSelected(null)} />
-    </section>
+        <BookDetailsDialog book={selected} openerRef={openerRef} onClose={() => setSelected(null)} />
+      </section>
+    </>
   );
 }
 
 /**
  * Individual book card component.
  *
- * @param props - Object containing the book data
- * @returns JSX.Element
+ * @param params - Card props.
+ * @returns Rendered card.
  */
 function BookCard({ book, onOpen }: { book: Book; onOpen?: (el: HTMLElement) => void }): JSX.Element {
   const [imageError, setImageError] = useState(false);
@@ -79,9 +160,14 @@ function BookCard({ book, onOpen }: { book: Book; onOpen?: (el: HTMLElement) => 
     <article className={styles.card}>
       <button
         className={styles.cardButton}
-        onClick={(e) => { e.currentTarget.blur(); if (onOpen) onOpen(e.currentTarget); }}
+        onClick={(e) => {
+          e.currentTarget.blur();
+          if (onOpen) {
+            onOpen(e.currentTarget);
+          }
+        }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
+          if (e.key === "Enter") {
             e.currentTarget.click();
           }
         }}
