@@ -1,9 +1,22 @@
-stack: node-vitest
-install_cmd: npm install
+stack: node-vitest+python-pytest
+install_cmd: npm install && python3 -m venv .venv && .venv/bin/pip install --disable-pip-version-check
+  -q pytest && if [ -f requirements.in ]; then .venv/bin/pip install --disable-pip-version-check
+  -q -r requirements.in; fi
 syntax_cmd: find . -path ./node_modules -prune -o \( -name '*.js' -o -name '*.mjs'
-  -o -name '*.cjs' \) -print0 | xargs -0 -r -n1 node --check
+  -o -name '*.cjs' \) -print0 | xargs -0 -r -n1 node --check; python3 -c "from pathlib
+  import Path; [compile(path.read_text(encoding='utf-8'), str(path), 'exec') for path
+  in Path('.').rglob('*.py') if '.venv' not in path.parts]"
 build_cmd: npm run build --if-present
-test_cmd: npx vitest run
-test_selector: npx vitest run {path}
+test_cmd: echo __PROPEL_STACK__:node-vitest; npx vitest run; s0=$?; echo __PROPEL_STACK__:python-pytest;
+  if find . -path ./node_modules -prune -o -path ./.venv -prune -o -path ./vendor
+  -prune -o -name 'test_*.py' -print -quit | grep -q .; then .venv/bin/python -m pytest
+  -q; fi; s1=$?; [ "$s0" -eq 0 ] && [ "$s1" -eq 0 ]
+test_selector: case "{path}" in *.py) echo __PROPEL_STACK__:python-pytest; .venv/bin/python
+  -m pytest -q {path} ;; *) echo __PROPEL_STACK__:node-vitest; npx vitest run {path}
+  ;; esac
 dependency_file: package.json
 runtime_version: '22'
+system_packages:
+- python3
+- python3-venv
+- python3-pip

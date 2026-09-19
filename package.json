@@ -18,7 +18,12 @@
     "typescript": "*",
     "vite": "*",
     "vitest": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "fastapi": "*",
+    "uvicorn": "*",
+    "pydantic": "*",
+    "httpx": "*",
+    "pytest": "*"
   },
   "devDependencies": {
     "jsdom": "*",
