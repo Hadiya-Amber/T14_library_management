@@ -18,7 +18,8 @@
     "typescript": "*",
     "vite": "*",
     "vitest": "*",
-    "react-dom": "*"
+    "react-dom": "*",
+    "python3": "*"
   },
   "devDependencies": {
     "jsdom": "*",

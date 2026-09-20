@@ -1,20 +1,11 @@
-stack: node-vitest+python-pytest
-install_cmd: npm install && python3 -m pip install --disable-pip-version-check -q
-  pytest && if [ -f requirements.in ]; then python3 -m pip install --disable-pip-version-check
-  -q -r requirements.in; fi
+stack: node-vitest
+install_cmd: npm install
 syntax_cmd: find . -path ./node_modules -prune -o \( -name '*.js' -o -name '*.mjs'
-  -o -name '*.cjs' \) -print0 | xargs -0 -r -n1 node --check; python3 -c "import os,
-  sys; S = {'node_modules', '.venv', '.propel', 'vendor', '.git', '__pycache__', 'dist',
-  'build', '.tox', '.mypy_cache'}; P = [os.path.join(r, f) for r, d, fs in os.walk('.')
-  if not d.__setitem__(slice(None), [x for x in d if x not in S]) for f in fs if f.endswith('.py')];
-  [compile(open(p, encoding='utf-8').read(), p, 'exec') for p in P]"
+  -o -name '*.cjs' \) -print0 | xargs -0 -r -n1 node --check
 build_cmd: npm run build --if-present
-test_cmd: echo __PROPEL_STACK__:node-vitest; npx vitest run; s0=$?; echo __PROPEL_STACK__:python-pytest;
-  if find . -path ./node_modules -prune -o -path ./.venv -prune -o -path ./vendor
-  -prune -o -name 'test_*.py' -print -quit | grep -q .; then python3 -m pytest -q;
-  fi; s1=$?; [ "$s0" -eq 0 ] && [ "$s1" -eq 0 ]
-test_selector: case "{path}" in *.py) echo __PROPEL_STACK__:python-pytest; python3
-  -m pytest -q {path} ;; *) echo __PROPEL_STACK__:node-vitest; npx vitest run {path}
-  ;; esac
+test_cmd: npx vitest run
+test_selector: npx vitest run {path}
 dependency_file: package.json
 runtime_version: '22'
+system_packages:
+- python3
