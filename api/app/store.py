@@ -56,6 +56,42 @@ class BookStore:
 
         return self._books.get(book_id)
 
+    def search(
+        self,
+        q: str | None = None,
+        available: bool | None = None,
+        limit: int | None = None,
+    ) -> list[Book]:
+        """Filter books by optional text query and availability.
+
+        Args:
+            q: Optional case-insensitive substring to match against title or author.
+            available: Optional availability flag to filter by.
+            limit: Optional maximum number of records to return.
+
+        Returns:
+            Filtered books in stored order.
+        """
+
+        books = self.list()
+
+        if q is not None:
+            normalized = q.strip().lower()
+            if normalized:
+                books = [
+                    book
+                    for book in books
+                    if normalized in book.title.lower() or normalized in book.author.lower()
+                ]
+
+        if available is not None:
+            books = [book for book in books if book.available is available]
+
+        if limit is not None:
+            books = books[:limit]
+
+        return books
+
     def _load(self) -> None:
         """Load books from the JSON file into memory."""
 
