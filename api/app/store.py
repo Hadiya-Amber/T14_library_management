@@ -162,6 +162,25 @@ class BookStore:
         payload = [book.model_dump() for book in self._books.values()]
         self._write_raw(payload)
 
+    def delete(self, book_id: str) -> bool:
+        """Remove a book by id and persist the change.
+
+        Args:
+            book_id: Identifier of the book to remove.
+
+        Returns:
+            True when a book was removed and the change persisted, False when
+            no book with the given id existed.
+        """
+
+        if book_id not in self._books:
+            return False
+
+        # Remove the book and persist the updated collection atomically.
+        del self._books[book_id]
+        self._persist()
+        return True
+
     def _raise_if_duplicate_isbn(self, isbn: str, exclude_id: str | None = None) -> None:
         """Raise `DuplicateIsbn` if ISBN already belongs to another book.
 
