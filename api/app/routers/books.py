@@ -1,4 +1,4 @@
-"""Read endpoints for the library catalogue."""
+"""Read and write endpoints for the library catalogue."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from api.app.models import Book
-from api.app.store import BookStore
+from api.app.models import Book, BookCreate
+from api.app.store import BookStore, DuplicateIsbn
 
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -63,3 +63,54 @@ def get_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> B
     if book is None:
         raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
     return book
+
+
+@router.post("", response_model=Book, status_code=201)
+def create_book(book: BookCreate, store: Annotated[BookStore, Depends(get_store)]) -> Book:
+    """Create a new book record.
+
+    Args:
+        book: Validated create payload.
+        store: Store dependency for persisting books.
+
+    Returns:
+        Newly created persisted book.
+
+    Raises:
+        HTTPException: If a duplicate ISBN already exists.
+    """
+
+    try:
+        return store.add(book)
+    except DuplicateIsbn as exc:
+        raise HTTPException(status_code=409, detail=f"ISBN {exc.isbn} already exists") from exc
+
+
+@router.put("/{book_id}", response_model=Book)
+def replace_book(
+    book_id: str,
+    book: BookCreate,
+    store: Annotated[BookStore, Depends(get_store)],
+) -> Book:
+    """Replace an existing book while keeping its identifier.
+
+    Args:
+        book_id: Identifier of the book to replace.
+        book: Validated replacement payload.
+        store: Store dependency for persisting books.
+
+    Returns:
+        Updated persisted book.
+
+    Raises:
+        HTTPException: If no book exists for id or ISBN conflicts.
+    """
+
+    try:
+        replacement = store.replace(book_id, book)
+    except DuplicateIsbn as exc:
+        raise HTTPException(status_code=409, detail=f"ISBN {exc.isbn} already exists") from exc
+
+    if replacement is None:
+        raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
+    return replacement
