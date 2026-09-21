@@ -6,9 +6,22 @@ import json
 import os
 import tempfile
 from pathlib import Path
+from uuid import uuid4
 
-from api.app.models import Book
+from api.app.models import Book, BookCreate
 from api.app.seed import SEED_BOOKS
+
+
+class DuplicateIsbn(ValueError):
+    """Raised when attempting to save a book with an existing ISBN.
+
+    Args:
+        isbn: Normalized ISBN that already exists in storage.
+    """
+
+    def __init__(self, isbn: str) -> None:
+        self.isbn = isbn
+        super().__init__(f"ISBN {isbn} already exists")
 
 
 class BookStore:
@@ -92,6 +105,48 @@ class BookStore:
 
         return books
 
+    def add(self, book: BookCreate) -> Book:
+        """Create and persist a new book record.
+
+        Args:
+            book: Validated create payload.
+
+        Returns:
+            Persisted book with generated identifier.
+
+        Raises:
+            DuplicateIsbn: If any stored book already uses this ISBN.
+        """
+
+        self._raise_if_duplicate_isbn(book.isbn)
+        created = Book(id=uuid4().hex, **book.model_dump())
+        self._books[created.id] = created
+        self._persist()
+        return created
+
+    def replace(self, book_id: str, book: BookCreate) -> Book | None:
+        """Replace a full book record while preserving its identifier.
+
+        Args:
+            book_id: Identifier for the record to replace.
+            book: Validated replacement payload.
+
+        Returns:
+            Updated book when the id exists, otherwise `None`.
+
+        Raises:
+            DuplicateIsbn: If another record already uses this ISBN.
+        """
+
+        if book_id not in self._books:
+            return None
+
+        self._raise_if_duplicate_isbn(book.isbn, exclude_id=book_id)
+        replacement = Book(id=book_id, **book.model_dump())
+        self._books[book_id] = replacement
+        self._persist()
+        return replacement
+
     def _load(self) -> None:
         """Load books from the JSON file into memory."""
 
@@ -100,6 +155,27 @@ class BookStore:
 
         books = [Book.model_validate(item) for item in payload]
         self._books = {book.id: book for book in books}
+
+    def _persist(self) -> None:
+        """Persist the current in-memory books map to disk."""
+
+        payload = [book.model_dump() for book in self._books.values()]
+        self._write_raw(payload)
+
+    def _raise_if_duplicate_isbn(self, isbn: str, exclude_id: str | None = None) -> None:
+        """Raise `DuplicateIsbn` if ISBN already belongs to another book.
+
+        Args:
+            isbn: Candidate normalized ISBN.
+            exclude_id: Optional id allowed to keep the same ISBN.
+
+        Raises:
+            DuplicateIsbn: If a conflicting record exists.
+        """
+
+        for book in self._books.values():
+            if book.isbn == isbn and book.id != exclude_id:
+                raise DuplicateIsbn(isbn)
 
     def _write_raw(self, payload: list[dict[str, object]]) -> None:
         """Atomically write raw payload to the data file.
