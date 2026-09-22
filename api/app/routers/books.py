@@ -44,6 +44,18 @@ def list_books(
     return store.search(q=q, available=available, limit=limit)
 
 
+@router.get("/stats", response_model=dict, summary="Books statistics", responses={"200": {"description": "Books statistics"}})
+def books_stats(store: Annotated[BookStore, Depends(get_store)]) -> dict:
+    """Return aggregated statistics about the current catalogue.
+
+    The result includes the total number of books, the count of available
+    books and the sorted list of distinct genres. It is computed from the
+    store on every call so it always reflects the current state.
+    """
+
+    return store.stats()
+
+
 @router.get("/{book_id}", response_model=Book, summary="Get a book", responses={"200": {"description": "The book"}, "404": {"description": "Book not found"}})
 def get_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> Book:
     """Return a single book by identifier.
