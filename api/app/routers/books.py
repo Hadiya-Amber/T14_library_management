@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from api.app.models import Book, BookCreate
 from api.app.store import BookStore, DuplicateIsbn
@@ -22,7 +22,7 @@ def get_store() -> BookStore:
     return BookStore()
 
 
-@router.get("", response_model=list[Book])
+@router.get("", response_model=list[Book], summary="List books", responses={"200": {"description": "A list of books"}})
 def list_books(
     store: Annotated[BookStore, Depends(get_store)],
     q: str | None = None,
@@ -44,7 +44,7 @@ def list_books(
     return store.search(q=q, available=available, limit=limit)
 
 
-@router.get("/{book_id}", response_model=Book)
+@router.get("/{book_id}", response_model=Book, summary="Get a book", responses={"200": {"description": "The book"}, "404": {"description": "Book not found"}})
 def get_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> Book:
     """Return a single book by identifier.
 
@@ -65,7 +65,7 @@ def get_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> B
     return book
 
 
-@router.post("", response_model=Book, status_code=201)
+@router.post("", response_model=Book, status_code=201, summary="Create a book", responses={"201": {"description": "Book created"}, "409": {"description": "Duplicate ISBN"}, "422": {"description": "Validation error"}})
 def create_book(book: BookCreate, store: Annotated[BookStore, Depends(get_store)]) -> Book:
     """Create a new book record.
 
@@ -86,7 +86,7 @@ def create_book(book: BookCreate, store: Annotated[BookStore, Depends(get_store)
         raise HTTPException(status_code=409, detail=f"ISBN {exc.isbn} already exists") from exc
 
 
-@router.put("/{book_id}", response_model=Book)
+@router.put("/{book_id}", response_model=Book, summary="Replace a book", responses={"200": {"description": "Book replaced"}, "404": {"description": "Book not found"}, "409": {"description": "Duplicate ISBN"}, "422": {"description": "Validation error"}})
 def replace_book(
     book_id: str,
     book: BookCreate,
@@ -114,3 +114,17 @@ def replace_book(
     if replacement is None:
         raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
     return replacement
+
+
+@router.delete("/{book_id}", summary="Delete a book", responses={"204": {"description": "Book deleted"}, "404": {"description": "Book not found"}})
+def delete_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> Response:
+    """Delete a book by identifier.
+
+    Returns 204 No Content on success, or raises HTTPException 404 when the
+    book does not exist.
+    """
+
+    deleted = store.delete(book_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
+    return Response(status_code=204)
