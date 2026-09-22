@@ -57,6 +57,24 @@ class BookStore:
 
         return list(self._books.values())
 
+    def stats(self) -> dict[str, object]:
+        """Compute a live summary of the catalogue.
+
+        Returns a dict with keys:
+        - total: total number of books (int)
+        - available: number of books with available == True (int)
+        - genres: sorted list of distinct non-empty genres (list[str])
+
+        The values are derived from the current in-memory store and are not
+        cached, so repeated calls always reflect the latest state.
+        """
+
+        books = self.list()
+        total = len(books)
+        available = sum(1 for b in books if getattr(b, "available", False) is True)
+        genres = sorted({getattr(b, "genre", None) for b in books if getattr(b, "genre", None) is not None})
+        return {"total": total, "available": available, "genres": genres}
+
     def get(self, book_id: str) -> Book | None:
         """Fetch a single book by id.
 
