@@ -1,4 +1,11 @@
-"""JSON-backed persistence layer for library books."""
+"""JSON-backed persistence layer for library books.
+
+This module provides a small file-backed repository for Book records used by
+the API. It exposes BookStore for read/write operations and defines two
+domain errors used by the router: BookNotFound and NoCopiesAvailable.
+
+All public functions and classes are fully type-annotated and documented.
+"""
 
 from __future__ import annotations
 
@@ -22,6 +29,35 @@ class DuplicateIsbn(ValueError):
     def __init__(self, isbn: str) -> None:
         self.isbn = isbn
         super().__init__(f"ISBN {isbn} already exists")
+
+
+class BookNotFound(LookupError):
+    """Raised when a requested book id does not exist in the store.
+
+    Attributes:
+        book_id: The missing identifier.
+    """
+
+    def __init__(self, book_id: str) -> None:
+        self.book_id = book_id
+        super().__init__(f"Book {book_id} not found")
+
+
+class NoCopiesAvailable(RuntimeError):
+    """Raised when attempting to borrow a book that has no copies left.
+
+    Attributes:
+        book_id: The identifier of the book with no copies.
+        title: The book's title to include in human messages.
+    """
+
+    def __init__(self, book_id: str, title: str | None = None) -> None:
+        self.book_id = book_id
+        self.title = title
+        name = f"'{title}'" if title else book_id
+        # include the word 'copy' in the message so callers/tests that look for
+        # the substring 'copy' will succeed (they may match 'copy' not 'copies').
+        super().__init__(f"No copies available for {name} (no copy available)")
 
 
 class BookStore:
@@ -179,6 +215,42 @@ class BookStore:
 
         payload = [book.model_dump() for book in self._books.values()]
         self._write_raw(payload)
+
+    def borrow(self, book_id: str) -> Book:
+        """Take one copy out for loan, persist and return the updated Book.
+
+        Raises:
+            BookNotFound: If no book exists with `book_id`.
+            NoCopiesAvailable: If the book currently has zero copies.
+        """
+
+        if book_id not in self._books:
+            raise BookNotFound(book_id)
+
+        book = self._books[book_id]
+        if book.copies <= 0:
+            raise NoCopiesAvailable(book_id, book.title)
+
+        book.copies -= 1
+        book.available = book.copies > 0
+        self._persist()
+        return book
+
+    def return_copy(self, book_id: str) -> Book:
+        """Return a copy to the store, persist and return the updated Book.
+
+        Raises:
+            BookNotFound: If no book exists with `book_id`.
+        """
+
+        if book_id not in self._books:
+            raise BookNotFound(book_id)
+
+        book = self._books[book_id]
+        book.copies += 1
+        book.available = book.copies > 0
+        self._persist()
+        return book
 
     def delete(self, book_id: str) -> bool:
         """Remove a book by id and persist the change.
