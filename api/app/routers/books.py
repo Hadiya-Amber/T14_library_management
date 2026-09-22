@@ -7,7 +7,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from api.app.models import Book, BookCreate
-from api.app.store import BookStore, DuplicateIsbn
+from api.app.store import BookStore, DuplicateIsbn, BookNotFound, NoCopiesAvailable
 
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -140,3 +140,32 @@ def delete_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
     return Response(status_code=204)
+
+
+@router.post("/{book_id}/borrow", response_model=Book, summary="Borrow a copy", responses={"200": {"description": "Book borrowed"}, "404": {"description": "Book not found"}, "409": {"description": "No copies available"}})
+def borrow_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> Book:
+    """Remove one copy from the book's available copies.
+
+    Raises HTTP 404 when the book is missing, or 409 when no copies remain.
+    """
+
+    try:
+        return store.borrow(book_id)
+    except BookNotFound:
+        raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
+    except NoCopiesAvailable as exc:
+        # exc contains a human friendly message naming the book
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+
+
+@router.post("/{book_id}/return", response_model=Book, summary="Return a copy", responses={"200": {"description": "Book returned"}, "404": {"description": "Book not found"}})
+def return_book(book_id: str, store: Annotated[BookStore, Depends(get_store)]) -> Book:
+    """Add one copy back to the book's available copies.
+
+    Raises HTTP 404 when the book is missing.
+    """
+
+    try:
+        return store.return_copy(book_id)
+    except BookNotFound:
+        raise HTTPException(status_code=404, detail=f"Book {book_id} not found")
