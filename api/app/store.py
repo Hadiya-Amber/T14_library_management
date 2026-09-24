@@ -82,7 +82,10 @@ class BookStore:
             self._write_raw(SEED_BOOKS)
 
         self._books: dict[str, Book] = {}
+        self._borrows_path = self._path.with_name(self._path.stem + ".borrows.json")
+        self._borrows: dict[str, int] = {}
         self._load()
+        self._load_borrows()
 
     def list(self) -> list[Book]:
         """Return all books in insertion order.
@@ -215,6 +218,8 @@ class BookStore:
 
         payload = [book.model_dump() for book in self._books.values()]
         self._write_raw(payload)
+        # persist borrows as a sidecar file as well
+        self._write_raw_borrows()
 
     def borrow(self, book_id: str) -> Book:
         """Take one copy out for loan, persist and return the updated Book.
@@ -233,6 +238,8 @@ class BookStore:
 
         book.copies -= 1
         book.available = book.copies > 0
+        # increment borrow count and persist both books and borrows
+        self._borrows[book_id] = self._borrows.get(book_id, 0) + 1
         self._persist()
         return book
 
@@ -303,3 +310,66 @@ class BookStore:
         finally:
             if os.path.exists(temp_path):
                 os.remove(temp_path)
+
+    def _load_borrows(self) -> None:
+        """Load borrow counts from the sidecar JSON file if present."""
+
+        if not self._borrows_path.exists():
+            self._borrows = {}
+            return
+
+        try:
+            with self._borrows_path.open("r", encoding="utf-8") as handle:
+                payload = json.load(handle)
+        except Exception:
+            # if the file is unreadable, ignore and start fresh
+            self._borrows = {}
+            return
+
+        # Expect a mapping of id -> int
+        counts: dict[str, int] = {}
+        for k, v in payload.items():
+            try:
+                counts[str(k)] = int(v)
+            except Exception:
+                # skip invalid entries
+                continue
+        self._borrows = counts
+
+    def _write_raw_borrows(self) -> None:
+        """Atomically write borrow counts to the sidecar JSON file."""
+
+        payload = {k: v for k, v in self._borrows.items() if v and v > 0}
+        # write atomically using tempfile in the same directory
+        fd, temp_path = tempfile.mkstemp(dir=str(self._borrows_path.parent), prefix="books-borrows-", suffix=".json")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as temp_file:
+                json.dump(payload, temp_file, ensure_ascii=False, indent=2)
+                temp_file.flush()
+                os.fsync(temp_file.fileno())
+            os.replace(temp_path, self._borrows_path)
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
+    def popular(self, limit: int = 5) -> list[dict[str, object]]:
+        """Return the most-borrowed books joined with their metadata.
+
+        Books with zero borrows are omitted. Results are ordered by
+        times_borrowed descending then title ascending. Returns up to `limit`
+        items.
+        """
+
+        # Collect only books that have a positive borrow count
+        items: list[tuple[str, int]] = [(bid, count) for bid, count in self._borrows.items() if count > 0]
+        # join with titles/authors from the catalogue, skipping missing books
+        joined: list[dict[str, object]] = []
+        for bid, count in items:
+            book = self._books.get(bid)
+            if not book:
+                continue
+            joined.append({"id": bid, "title": book.title, "author": book.author, "times_borrowed": count})
+
+        # sort by times_borrowed desc, then title asc
+        joined.sort(key=lambda x: (-int(x.get("times_borrowed", 0)), x.get("title", "")))
+        return joined[:limit]

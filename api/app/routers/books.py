@@ -6,7 +6,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
-from api.app.models import Book, BookCreate
+from api.app.models import Book, BookCreate, PopularBook
 from api.app.store import BookStore, DuplicateIsbn, BookNotFound, NoCopiesAvailable
 
 router = APIRouter(prefix="/books", tags=["books"])
@@ -54,6 +54,27 @@ def books_stats(store: Annotated[BookStore, Depends(get_store)]) -> dict:
     """
 
     return store.stats()
+
+
+@router.get("/popular", response_model=list[PopularBook], summary="Most borrowed books", responses={"200": {"description": "Most borrowed books"}, "422": {"description": "Validation error"}})
+def list_popular(store: Annotated[BookStore, Depends(get_store)], limit: int = Query(default=5, ge=1, le=50)) -> list[PopularBook]:
+    """Return the most borrowed books capped by `limit`.
+
+    The route is declared before `/books/{book_id}` so that `popular` is not
+    interpreted as a book id.
+    """
+
+    # store.popular may return dicts or model instances; normalize sorting here
+    items = store.popular(limit=limit)
+
+    def _get(obj, key: str):
+        if isinstance(obj, dict):
+            return obj.get(key)
+        return getattr(obj, key, None)
+
+    # sort by times_borrowed desc, then title asc
+    items_sorted = sorted(items, key=lambda it: (-int(_get(it, "times_borrowed") or 0), _get(it, "title") or ""))
+    return items_sorted[:limit]
 
 
 @router.get("/{book_id}", response_model=Book, summary="Get a book", responses={"200": {"description": "The book"}, "404": {"description": "Book not found"}})

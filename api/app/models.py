@@ -98,3 +98,15 @@ class Book(BookCreate):
     """
 
     id: str
+
+
+class PopularBook(BaseModel):
+    """Response model for a popular book entry.
+
+    Carries a subset of the persisted Book fields plus the times_borrowed count.
+    """
+
+    id: str
+    title: str
+    author: str
+    times_borrowed: int
